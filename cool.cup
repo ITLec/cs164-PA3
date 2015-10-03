@@ -158,9 +158,9 @@ feature
 
 formal_list
 	::= /* empty */
-		{: RESULT = new formal_list(curr_lineno()); :}
+		{: RESULT = new Formals(curr_lineno()); :}
 	| formal:f
-		{: RESULT = new formal_list(curr_lineno()).appendElement(f); :}
+		{: RESULT = new Formals(curr_lineno()).appendElement(f); :}
 	| formal_list:l COMMA formal:f
 		{: RESULT = l.append(f); :}
 	;
@@ -208,9 +208,18 @@ expr
 	/* isvoid expression */
 	| ISVOID expr:e
 		{: RESULT = new isvoid(curr_lineno(), e); :}
+
 	/* New expression */
 	| NEW TYPEID:n
 		{: RESULT = new_(curr_lineno(), n); :}
+
+	/* While loop */
+	| WHILE expr:e1 LOOP expr:e2 POOL
+		{: RESULT = new loop(curr_lineno(), e1, e2); :}
+
+	/* IF statement */
+	| IF expr:e1 THEN expr:e2 ELSE expr:e3 fi
+		{: RESULT = new cond(curr_lineno(), e1, e2, e3); :}
 
 	/* Assignment */
 	| OBJECTID:o ASSIGN expr:e
@@ -218,11 +227,12 @@ expr
 
 	/* Case expression */
 	| CASE expr:e OF cases:c ESAC
-		{: RESULT = new typcase(curr_lineno, e, c); :}
+		{: RESULT = new typcase(curr_lineno(), e, c); :}
 
 	/* Let expression */
 	| LET let_expr:l
 		{: RESULT = l; :}
+
 	/* Block expression */
 
 	/* Static dispatch */
@@ -258,20 +268,21 @@ let_expr
 
 	/* Let expression with no additional vars; has assignment */
 	| OBJECTID:o COLON TYPEID:n ASSIGN expr:e1 IN expr:e2
-		{: RESULT = new let(curr_lineno(), o, n, e, e2); :}
+		{: RESULT = new let(curr_lineno(), o, n, e1, e2); :}
 
 	/* Let expression with no assignment; has additional vars*/
-	| OBJECTID:o COLON TYPEID:n IN COMMA let_expr:l
+	| OBJECTID:o COLON TYPEID:n COMMA let_expr:l
 		{: RESULT = new let(curr_lineno(), o, n, new no_expr(curr_lineno()), l); :}
 
 	/* Let expression with both assignment and additional vars */
-	| OBJECTID:o COLON TYPEID:n ASSIGN expr:e1 COMMA let_expr:l
+	| OBJECTID:o COLON TYPEID:n ASSIGN expr:e COMMA let_expr:l
 		{: RESULT = new let(curr_lineno(), o, n, e, l); :}
+	;
 
 /* Case branches */
 cases
 	::= OBJECTID:o COLON TYPEID:n DARROW expr:e SEMI
 		{: RESULT = new Cases(curr_lineno()).appendElement(new branch(curr_lineno(), o, n, e)); :}
-	| cases:c OBJECTID o COLON TYPEID:n DARROW expr:e SEMI
-		{: RESULT = c.appendElement(new branch(curr_lineno(), o, n, e));}
+	| cases:c OBJECTID:o COLON TYPEID:n DARROW expr:e SEMI
+		{: RESULT = c.appendElement(new branch(curr_lineno(), o, n, e)); :}
 	;
