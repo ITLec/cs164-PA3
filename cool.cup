@@ -80,9 +80,9 @@ nonterminal Feature feature;
 nonterminal Expression expr;
 nonterminal Expressions actuals, exp_list;
 nonterminal Formals formal_list;
-nonterminal formal_c formal;
+nonterminal formalc formal;
 nonterminal Cases cases;
-nonterminal Let let_expr;
+nonterminal Expression let_expr;
 
 /*
  * Precedence declarations.
@@ -162,12 +162,12 @@ formal_list
 	| formal:f
 		{: RESULT = new Formals(curr_lineno()).appendElement(f); :}
 	| formal_list:l COMMA formal:f
-		{: RESULT = l.append(f); :}
+		{: RESULT = l.appendElement(f); :}
 	;
 
 formal
 	::= OBJECTID:o COLON TYPEID:n
-		{: RESULT = new formal_c(curr_lineno(), o, n); :}
+		{: RESULT = new formalc(curr_lineno(), o, n); :}
 	;
 
 /* Expressions */
@@ -211,14 +211,14 @@ expr
 
 	/* New expression */
 	| NEW TYPEID:n
-		{: RESULT = new_(curr_lineno(), n); :}
+		{: RESULT = new new_(curr_lineno(), n); :}
 
 	/* While loop */
 	| WHILE expr:e1 LOOP expr:e2 POOL
 		{: RESULT = new loop(curr_lineno(), e1, e2); :}
 
 	/* IF statement */
-	| IF expr:e1 THEN expr:e2 ELSE expr:e3 fi
+	| IF expr:e1 THEN expr:e2 ELSE expr:e3 FI
 		{: RESULT = new cond(curr_lineno(), e1, e2, e3); :}
 
 	/* Assignment */
@@ -230,8 +230,8 @@ expr
 		{: RESULT = new typcase(curr_lineno(), e, c); :}
 
 	/* Let expression */
-	| LET let_expr:l
-		{: RESULT = l; :}
+	| LET let_expr:le
+		{: RESULT = le; :}
 
 	/* Block expression */
 
@@ -271,12 +271,12 @@ let_expr
 		{: RESULT = new let(curr_lineno(), o, n, e1, e2); :}
 
 	/* Let expression with no assignment; has additional vars*/
-	| OBJECTID:o COLON TYPEID:n COMMA let_expr:l
-		{: RESULT = new let(curr_lineno(), o, n, new no_expr(curr_lineno()), l); :}
+	| OBJECTID:o COLON TYPEID:n COMMA let_expr:le
+		{: RESULT = new let(curr_lineno(), o, n, new no_expr(curr_lineno()), le); :}
 
 	/* Let expression with both assignment and additional vars */
-	| OBJECTID:o COLON TYPEID:n ASSIGN expr:e COMMA let_expr:l
-		{: RESULT = new let(curr_lineno(), o, n, e, l); :}
+	| OBJECTID:o COLON TYPEID:n ASSIGN expr:e COMMA let_expr:le
+		{: RESULT = new let(curr_lineno(), o, n, e, le); :}
 	;
 
 /* Case branches */
