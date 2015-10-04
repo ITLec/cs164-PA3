@@ -137,6 +137,7 @@ class
 				    f, curr_filename()); :}
 	| CLASS TYPEID:n INHERITS TYPEID:p LBRACE optional_feature_list:f RBRACE SEMI
 	    {: RESULT = new class_c(curr_lineno(), n, p, f, curr_filename()); :}
+	| error SEMI
 	;
 
 
@@ -154,6 +155,7 @@ feature
 		{: RESULT = new attr(curr_lineno(), o, n, e); :}
 	| OBJECTID:o COLON TYPEID:n
 		{: RESULT = new attr(curr_lineno(), o, n, new no_expr(curr_lineno())); :}
+	| error 
 	;
 
 formal_list
@@ -277,6 +279,10 @@ let_expr
 	/* Let expression with both assignment and additional vars */
 	| OBJECTID:o COLON TYPEID:n ASSIGN expr:e COMMA let_expr:le
 		{: RESULT = new let(curr_lineno(), o, n, e, le); :}
+	/* If we have an error case, we treat it as a valid let binding so that, in a list, the errant variable can be skipped. */
+	| error COMMA let_expr:le
+	/* If the last let expression in the list is bad. */
+	| error
 	;
 
 /* Case branches */
