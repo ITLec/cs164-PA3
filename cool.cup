@@ -235,11 +235,13 @@ expr
 	| LET let_expr:le
 		{: RESULT = le; :}
 
-	/* Block expression */
-
+	/* Block expression with one statement with no semicolon. */
+	| LBRACE expr_semi RBRACE
 	/* Static dispatch */
         ;
 
+/* Expressions for block statements that must have semicolons. */
+expr_semi ::= expr SEMI;
 
 /* Method arguments */
 actuals
