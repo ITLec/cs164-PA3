@@ -213,6 +213,8 @@ expr
 	    {: RESULT = new bool_const(curr_lineno(), b); :}
 	| OBJECTID:o
 	    {: RESULT = new object(curr_lineno(), o); :}
+
+	/* shorthand for self.<id>(<expr>) */
 	| OBJECTID:n actuals:a
 	    {: RESULT = new dispatch(curr_lineno(),
 	                             new object(curr_lineno(), 
@@ -250,8 +252,13 @@ expr
 	| LBRACE block_list:bl RBRACE
 		{: RESULT = new block(curr_lineno(), bl); :}
 
+	| expr:e DOT OBJECTID:o actuals:a
+		{: RESULT = new dispatch(curr_lineno(), e, o, a); :}
+
 	/* Static dispatch */
-        ;
+	| expr:e LBRACE AT TYPEID:n RBRACE DOT OBJECTID:o actuals:a
+		{: RESULT = new static_dispatch(curr_lineno(), e, n, o, a); :}
+    ;
 
 
 /* Method arguments */
@@ -306,7 +313,7 @@ let_expr
 	/* Let expression with both assignment and additional vars */
 	| OBJECTID:o COLON TYPEID:n ASSIGN expr:e COMMA let_expr:le
 		{: RESULT = new let(curr_lineno(), o, n, e, le); :}
-		
+
 	| error COMMA let_expr:le
 		{: RESULT = le; :}
 	;
