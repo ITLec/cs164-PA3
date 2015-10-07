@@ -157,7 +157,7 @@ optional_feature_list
 	;
 
 feature
-	::= OBJECTID:o LPAREN formal_list:fl COLON TYPEID:n LBRACE expr:e RBRACE
+	::= OBJECTID:o LPAREN formal_list:fl RPAREN COLON TYPEID:n LBRACE expr:e RBRACE
 		{: RESULT = new method(curr_lineno(), o, fl, n, e); :}
 	| OBJECTID:o COLON TYPEID:n ASSIGN expr:e
 		{: RESULT = new attr(curr_lineno(), o, n, e); :}
@@ -256,7 +256,7 @@ expr
 		{: RESULT = new dispatch(curr_lineno(), e, o, a); :}
 
 	/* Static dispatch */
-	| expr:e LBRACE AT TYPEID:n RBRACE DOT OBJECTID:o actuals:a
+	| expr:e AT TYPEID:n DOT OBJECTID:o actuals:a
 		{: RESULT = new static_dispatch(curr_lineno(), e, n, o, a); :}
     ;
 
