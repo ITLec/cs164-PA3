@@ -155,3 +155,8 @@ Instructions
 
 Write-up for PA3J
 -----------------
+One of the most confusing and discussed design decisions had to do with error handling with respect to lists. The project specs required us to be able to recover from an incorrectly defined class, as long as it was closed properly, and move onto the next class. Similarly, we were to move over incorrectly defined features, incorrectly defined expressions within block statements, and variables within let statements, onto the next feature, expression, or variable.
+
+We implemented lists of expressions in expr_lists, which consisted of lists of expressions (expr). Our initial 'gut feeling' to handle errors within incorrect expression lists was to define a special type of rule for an expr that was the error keyword SEMI. The action for this rule would be to do nothing. Our thinking was that if an errant expression was caught with this rule for expr, nothing would happen when this rule was called from expr_list and expr_list would keep parsing (valid) expressions.
+
+How wrong we were. Thanks to some helpful TAs in office hours, we learned that, in cup, a rule not having a corresponding RESULT action is equivalent to the rule not existing at all! Therefore, a better design decision was to define special cases in expr_lists, class_lists, and lists of let statement variables that would still reference the list object but include the error token.
