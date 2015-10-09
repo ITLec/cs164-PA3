@@ -27,3 +27,21 @@ Class D inherts A {
 Class E inherits A {
 ;
 
+Class F {
+	y : Int;
+	x : Int <<<<;
+	bad_method( yabadadoo, x : int ) : Int { 5 };
+	bad_method2() : {};
+};
+
+(* error: block contains invalid expressions *)
+Class G {
+	method() : Int {
+		{
+			fi;
+			3;
+			();
+			5;
+		}
+	};
+};
